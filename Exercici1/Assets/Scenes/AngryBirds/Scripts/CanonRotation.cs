@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CanonRotation : MonoBehaviour
 {
-    public Vector3 _maxRotation = new Vector3(0, 0, 70f);
+    public Vector3 _maxRotation = new Vector3(0, 0, 90f);
     public Vector3 _minRotation = new Vector3(0, 0, -51.6f);
     private float offset = -51.6f;
     public GameObject ShootPoint;
@@ -21,7 +21,7 @@ public class CanonRotation : MonoBehaviour
     }
     void Update()
     {
-        var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition); //guardem posició de la càmera
+        var mousePos = Input.mousePosition; //guardem posició de la càmera
         var dist = mousePos - ShootPoint.transform.position; //distància entre el click i la bala
         var ang = (Mathf.Atan2(dist.y, dist.x) * 180f / Mathf.PI + offset);
         if(ang > _minRotation.z && ang < _maxRotation.z)
@@ -33,13 +33,13 @@ public class CanonRotation : MonoBehaviour
         {
             if(ProjectileSpeed < MaxSpeed)
             {
-                ProjectileSpeed += 4f; //cada frame s'ha de fer 4 cops més gran
+                ProjectileSpeed += 4f * Time.deltaTime; //cada frame s'ha de fer 4 cops més gran
             }
         }
         if(Input.GetMouseButtonUp(0))
         { 
-            var projectile = Instantiate(Bullet, ShootPoint.transform.position, transform.rotation); //On s'instancia?
-            projectile.GetComponent<Rigidbody2D>().velocity = new Vector2(ProjectileSpeed, ProjectileSpeed); //quina velocitat ha de tenir la bala? s'ha de fer alguna cosa al vector direcció?
+            var projectile = Instantiate(Bullet, ShootPoint.transform.position, Quaternion.identity); //On s'instancia?
+            projectile.GetComponent<Rigidbody2D>().velocity = new Vector2(ProjectileSpeed * dist.normalized.x, ProjectileSpeed * dist.normalized.y); //quina velocitat ha de tenir la bala? s'ha de fer alguna cosa al vector direcció?
             ProjectileSpeed = 0;
         }
         CalculateBarScale();
